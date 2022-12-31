@@ -3,25 +3,21 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"image"
-	"image/draw"
-	"image/png"
-	"os"
-	"time"
-
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
+	"golang.org/x/image/font"
+	_ "golang.org/x/image/font"
+	"golang.org/x/image/font/basicfont"
+	_ "golang.org/x/image/font/basicfont"
+	"golang.org/x/image/math/fixed"
+	_ "golang.org/x/image/math/fixed"
+	"image"
+	"image/color"
+	"image/png"
+	"os"
 )
-
-type Board struct {
-	canvasWidth  float32
-	canvasHeight float32
-	fps          int
-	then         int64
-	margin       int
-}
 
 func loadImage(filePath string) image.Image {
 	imgFile, err := os.Open(filePath)
@@ -44,45 +40,18 @@ func main() {
 	background := loadImage("./assets/background.png")
 	background2 := loadImage("./assets/background2.png")
 
-	now := time.Now().UnixMilli()
-	game := &Board{
-		800,
-		500,
-		10,
-		now,
-		4,
-	}
-
-	fpsInterval := int64(1000 / game.fps)
-
 	backgroundImg := canvas.NewImageFromImage(background)
 	backgroundImg.FillMode = canvas.ImageFillOriginal
 
-	sprite := image.NewRGBA(background.Bounds())
+	var sprite = image.NewRGBA(background.Bounds())
 
 	playerImg := canvas.NewRasterFromImage(sprite)
 
+	addLabel(sprite, 300, 300, "hello world bla bla bla blA,bla,")
+
 	c := container.New(layout.NewMaxLayout(), backgroundImg, playerImg)
+
 	window.SetContent(c)
-
-	go func() {
-
-		for {
-			time.Sleep(time.Millisecond)
-
-			now := time.Now().UnixMilli()
-			elapsed := now - game.then
-
-			if elapsed > fpsInterval {
-				game.then = now
-				draw.Draw(sprite, sprite.Bounds(), image.Transparent, image.ZP, draw.Src)
-				playerImg = canvas.NewRasterFromImage(sprite)
-				c.Refresh()
-
-			}
-		}
-
-	}()
 
 	go func() {
 
@@ -96,15 +65,20 @@ func main() {
 			// Holds the string that scanned
 			text := scanner.Text()
 			if len(text) != 0 {
-				backgroundImg = canvas.NewImageFromImage(background2)
-				backgroundImg.FillMode = canvas.ImageFillOriginal
 
-				sprite = image.NewRGBA(background.Bounds())
+				if text == "attack" {
+					backgroundImg = canvas.NewImageFromImage(background2)
+					backgroundImg.FillMode = canvas.ImageFillOriginal
 
-				playerImg = canvas.NewRasterFromImage(sprite)
+					sprite = image.NewRGBA(background.Bounds())
+					addLabel(sprite, 300, 300, "second text bla bla bla bla bla")
 
-				c = container.New(layout.NewMaxLayout(), backgroundImg, playerImg)
-				window.SetContent(c)
+					playerImg = canvas.NewRasterFromImage(sprite)
+
+					c = container.New(layout.NewMaxLayout(), backgroundImg, playerImg)
+					window.SetContent(c)
+				}
+
 				fmt.Println(text)
 				arr = append(arr, text)
 			} else {
@@ -119,4 +93,23 @@ func main() {
 
 	window.CenterOnScreen()
 	window.ShowAndRun()
+
+}
+
+/**
+Function to add label into image.
+We use [Drawer] type to use [DrawString] implementation to add label text
+into the current image.
+*/
+func addLabel(img *image.RGBA, x, y int, label string) {
+	col := color.RGBA{200, 100, 0, 255}
+	point := fixed.Point26_6{fixed.I(x), fixed.I(y)}
+
+	d := &font.Drawer{
+		Dst:  img,
+		Src:  image.NewUniform(col),
+		Face: basicfont.Face7x13,
+		Dot:  point,
+	}
+	d.DrawString(label)
 }
