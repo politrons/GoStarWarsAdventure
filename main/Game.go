@@ -20,20 +20,6 @@ import (
 	"os"
 )
 
-func loadImage(filePath string) image.Image {
-	imgFile, err := os.Open(filePath)
-	defer imgFile.Close()
-	if err != nil {
-		fmt.Println("Cannot read file:", err)
-	}
-
-	imgData, err := png.Decode(imgFile)
-	if err != nil {
-		fmt.Println("Cannot decode file:", err)
-	}
-	return imgData.(image.Image)
-}
-
 //Index of background image
 var imageIndex = 0
 
@@ -72,14 +58,8 @@ func main() {
 	backgroundImg.FillMode = canvas.ImageFillOriginal
 
 	var sprite = image.NewRGBA(background.Bounds())
-
-	playerImg := canvas.NewRasterFromImage(sprite)
-
 	addLabel(sprite, 300, 300, gameTexts[imageIndex])
-
-	c := container.New(layout.NewMaxLayout(), backgroundImg, playerImg)
-
-	window.SetContent(c)
+	appendImage(sprite, backgroundImg, window)
 
 	go func() {
 
@@ -103,7 +83,6 @@ func main() {
 
 					sprite := image.NewRGBA(background.Bounds())
 					addLabel(sprite, 300, 300, gameTexts[imageIndex])
-
 					appendImage(sprite, backgroundImg, window)
 				} else {
 					sprite := image.NewRGBA(background.Bounds())
@@ -126,6 +105,31 @@ func main() {
 	window.CenterOnScreen()
 	window.ShowAndRun()
 
+}
+
+/**
+Function to load a new image from a path using [os] package to read an create [File],
+and [png] to Decode from a file into an [Image] instance .
+Using [defer] we guarantee that after we load the file image is close,
+before we end the function.
+*/
+func loadImage(filePath string) image.Image {
+	imgFile, err := os.Open(filePath)
+	defer func(imgFile *os.File) {
+		err := imgFile.Close()
+		if err != nil {
+			fmt.Println("Error closing file:", err)
+		}
+	}(imgFile)
+	if err != nil {
+		fmt.Println("Cannot read file:", err)
+	}
+
+	imgData, err := png.Decode(imgFile)
+	if err != nil {
+		fmt.Println("Cannot decode file:", err)
+	}
+	return imgData.(image.Image)
 }
 
 /**
