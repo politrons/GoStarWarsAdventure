@@ -155,5 +155,5 @@ func (actions LevelAction) containsAll(action string) (bool, int) {
 		}
 	}
 	log.Println("Action words found ", actionCount)
-	return actions.minActions == actionCount, actions.minActions - actionCount
+	return actions.minActions <= actionCount, actions.minActions - actionCount
 }
