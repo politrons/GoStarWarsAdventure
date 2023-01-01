@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -14,6 +13,7 @@ import (
 	"image/jpeg"
 	"log"
 	"os"
+	"strings"
 )
 
 //Index of background image
@@ -23,29 +23,20 @@ type Actions struct {
 	values []string
 }
 
-type ArrayFeature interface {
-	contains(element string) bool
+type ActionFeature interface {
+	containsAll(element string) bool
 }
 
 var window = app.New().NewWindow("StarWars Adventure")
 
+//All containers used in the game and append in the
 var boardContent = container.NewVBox()
 var labelContent = container.NewVBox()
 var inputContent = container.NewVBox()
 var imageContent = container.NewVBox()
 
 func main() {
-
-	background := loadImage(images[gameLevel])
-	backgroundImg := canvas.NewImageFromImage(background)
-
-	backgroundImg.SetMinSize(fyne.Size{800, 800})
-	backgroundImg.FillMode = canvas.ImageFillOriginal
-
-	//var sprite = image.NewRGBA(background.Bounds())
-	//appendLogic(sprite, backgroundImg, gameTexts[gameLevel], window)
-
-	appendImage(backgroundImg)
+	appendImage(createLevelImage())
 	appendLabel(gameTexts[gameLevel])
 	appendInput()
 
@@ -53,10 +44,7 @@ func main() {
 	boardContent.Add(labelContent)
 	boardContent.Add(inputContent)
 
-	//c := container.NewGridWithRows(2, backgroundImg, open, close, insert, playerImg)
-
 	window.SetContent(boardContent)
-
 	window.CenterOnScreen()
 	window.ShowAndRun()
 
@@ -81,55 +69,32 @@ func appendInput() {
 	inputContent.Add(saveButton)
 }
 
-//
-///**
-//Function to append the image into the container once we we create a [Raster] instance from
-//the original image.
-//*/
-//func appendLogic(sprite *image.RGBA, backgroundImg *canvas.Image, text string, window fyne.Window) {
-//	//playerImg := canvas.NewRasterFromImage(sprite)
-//
-//	label := widget.NewLabel(text)
-//
-//	labelContent := container.NewVBox(label)
-//
-//	input := widget.NewEntry()
-//	input.SetPlaceHolder("Enter action...")
-//
-//	saveButton := widget.NewButton("Save", processAction(input))
-//
-//	imageContent := container.NewVBox(backgroundImg)
-//
-//	inputContent := container.NewVBox(input, saveButton)
-//
-//	imageContent.Add(labelContent)
-//	imageContent.Add(inputContent)
-//
-//	//c := container.NewGridWithRows(2, backgroundImg, open, close, insert, playerImg)
-//
-//	window.SetContent(imageContent)
-//}
-
+/**
+Function to obtain the user action over the level and determine if he pass to the next level or not.
+*/
 func processAction(input *widget.Entry) func() {
 	return func() {
-		text := input.Text
-		log.Println("Action was:", text)
-		if len(text) != 0 {
-			actions := Actions{values: imagesActions[gameLevel]}
-			if actions.contains(text) {
+		userActions := input.Text
+		log.Println("Action was:", userActions)
+		if len(userActions) != 0 {
+			levelActions := Actions{values: imagesActions[gameLevel]}
+			if levelActions.containsAll(userActions) {
 				gameLevel = gameLevel + 1
-				background := loadImage(images[gameLevel])
-				backgroundImg := canvas.NewImageFromImage(background)
-				backgroundImg.FillMode = canvas.ImageFillOriginal
-
-				appendImage(backgroundImg)
+				levelImg := createLevelImage()
+				appendImage(levelImg)
 				appendLabel(gameTexts[gameLevel])
-				//appendLogic(sprite, backgroundImg, gameTexts[gameLevel], window)
 			} else {
 				appendLabel("Wrong Action")
 			}
 		}
 	}
+}
+
+func createLevelImage() *canvas.Image {
+	background := loadImage(images[gameLevel])
+	backgroundImg := canvas.NewImageFromImage(background)
+	backgroundImg.FillMode = canvas.ImageFillOriginal
+	return backgroundImg
 }
 
 /**
@@ -160,11 +125,15 @@ func loadImage(filePath string) image.Image {
 /**
 Util function to check if an action is part of the array passed
 */
-func (actions Actions) contains(element string) bool {
-	for _, action := range actions.values {
-		if action == element {
-			return true
+func (actions Actions) containsAll(action string) bool {
+	var actionCount = 0
+	for _, userAction := range strings.Split(action, " ") {
+		for _, action := range actions.values {
+			if action == userAction {
+				actionCount += 1
+			}
 		}
 	}
-	return false
+	log.Println("Action words found ", actionCount)
+	return len(actions.values) == actionCount
 }
