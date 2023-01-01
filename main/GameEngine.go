@@ -32,6 +32,7 @@ var window = app.New().NewWindow("StarWars Adventure")
 //All containers used in the game and append in the
 var boardContent = container.NewVBox()
 var labelContent = container.NewVBox()
+var errorContent = container.NewVBox()
 var inputContent = container.NewVBox()
 var imageContent = container.NewVBox()
 
@@ -39,9 +40,11 @@ func main() {
 	appendImage(createLevelImage())
 	appendLabel(gameTexts[gameLevel])
 	appendInput()
+	errorContent.Hide()
 
 	boardContent.Add(imageContent)
 	boardContent.Add(labelContent)
+	boardContent.Add(errorContent)
 	boardContent.Add(inputContent)
 
 	window.SetContent(boardContent)
@@ -57,13 +60,21 @@ func appendImage(backgroundImg *canvas.Image) {
 
 func appendLabel(text string) {
 	labelContent.RemoveAll()
-	labelContent.Add(widget.NewLabel(text))
+	label := widget.NewLabel(text)
+	labelContent.Add(label)
+}
+
+func appendErrorLabel(text string) {
+	errorContent.Show()
+	errorContent.RemoveAll()
+	label := widget.NewLabel(text)
+	errorContent.Add(label)
 }
 
 func appendInput() {
 	input := widget.NewEntry()
 	input.SetPlaceHolder("Enter action...")
-	saveButton := widget.NewButton("Save", processAction(input))
+	saveButton := widget.NewButton("Enter", processAction(input))
 	inputContent.RemoveAll()
 	inputContent.Add(input)
 	inputContent.Add(saveButton)
@@ -77,14 +88,17 @@ func processAction(input *widget.Entry) func() {
 		userActions := input.Text
 		log.Println("Action was:", userActions)
 		if len(userActions) != 0 {
+			cleanErrorLabel()
 			levelActions := Actions{values: imagesActions[gameLevel]}
-			if levelActions.containsAll(userActions) {
+			allActions, remains := levelActions.containsAll(userActions)
+			if allActions {
 				gameLevel = gameLevel + 1
+				cleanInput()
 				levelImg := createLevelImage()
 				appendImage(levelImg)
 				appendLabel(gameTexts[gameLevel])
 			} else {
-				appendLabel("Wrong Action")
+				appendErrorLabel(fmt.Sprintf("Wrong Action. You're missing %d actions", remains))
 			}
 		}
 	}
@@ -95,6 +109,15 @@ func createLevelImage() *canvas.Image {
 	backgroundImg := canvas.NewImageFromImage(background)
 	backgroundImg.FillMode = canvas.ImageFillOriginal
 	return backgroundImg
+}
+
+func cleanErrorLabel() {
+	errorContent.RemoveAll()
+	errorContent.Hide()
+}
+
+func cleanInput() {
+	inputContent.RemoveAll()
 }
 
 /**
@@ -125,7 +148,7 @@ func loadImage(filePath string) image.Image {
 /**
 Util function to check if an action is part of the array passed
 */
-func (actions Actions) containsAll(action string) bool {
+func (actions Actions) containsAll(action string) (bool, int) {
 	var actionCount = 0
 	for _, userAction := range strings.Split(action, " ") {
 		for _, action := range actions.values {
@@ -135,5 +158,5 @@ func (actions Actions) containsAll(action string) bool {
 		}
 	}
 	log.Println("Action words found ", actionCount)
-	return len(actions.values) == actionCount
+	return len(actions.values) == actionCount, len(actions.values) - actionCount
 }
