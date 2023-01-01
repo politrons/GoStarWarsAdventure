@@ -10,7 +10,7 @@ import (
 var images = []string{
 	"./assets/tatooin.jpeg",
 	"./assets/tatooin_inside.jpeg",
-	"./assets/vaina.jpeg",
+	"./assets/pod.jpeg",
 }
 
 //Collection of texts of the whole game
@@ -22,9 +22,14 @@ var gameTexts = []string{
 	"You escape the zone in the pod. Then you notice that two storm troopers start shooting to you. You dont have any weapons. But you know the pod can go faster",
 }
 
+type LevelAction struct {
+	minActions int
+	actions    []string
+}
+
 //Collection of actions of the whole game
-var imagesActions = [][]string{
-	{"inside", "house"},
-	{"activate", "po"},
-	{"accelerate"},
+var imagesActions = []LevelAction{
+	{2, []string{"into", "inside", "house", "cave"}},
+	{2, []string{"start", "on", "activate", "pod", "racer"}},
+	{1, []string{"accelerate", "full-throttler"}},
 }

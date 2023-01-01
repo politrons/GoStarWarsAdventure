@@ -19,10 +19,6 @@ import (
 //Index of background image
 var gameLevel = 0
 
-type Actions struct {
-	values []string
-}
-
 type ActionFeature interface {
 	containsAll(element string) bool
 }
@@ -89,7 +85,7 @@ func processAction(input *widget.Entry) func() {
 		log.Println("Action was:", userActions)
 		if len(userActions) != 0 {
 			cleanErrorLabel()
-			levelActions := Actions{values: imagesActions[gameLevel]}
+			levelActions := imagesActions[gameLevel]
 			allActions, remains := levelActions.containsAll(userActions)
 			if allActions {
 				gameLevel = gameLevel + 1
@@ -118,6 +114,7 @@ func cleanErrorLabel() {
 
 func cleanInput() {
 	inputContent.RemoveAll()
+	appendInput()
 }
 
 /**
@@ -148,15 +145,15 @@ func loadImage(filePath string) image.Image {
 /**
 Util function to check if an action is part of the array passed
 */
-func (actions Actions) containsAll(action string) (bool, int) {
+func (actions LevelAction) containsAll(action string) (bool, int) {
 	var actionCount = 0
 	for _, userAction := range strings.Split(action, " ") {
-		for _, action := range actions.values {
+		for _, action := range actions.actions {
 			if action == userAction {
 				actionCount += 1
 			}
 		}
 	}
 	log.Println("Action words found ", actionCount)
-	return len(actions.values) == actionCount, len(actions.values) - actionCount
+	return actions.minActions == actionCount, actions.minActions - actionCount
 }
