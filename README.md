@@ -22,4 +22,6 @@ start over again.
 
 The mean reason of this game, is to learn ```fyne``` library, and do some ```Golang``` Katas.
 
+## Run game
 
+Having install and configure ```Go compiler```, just run the ```main``` function of ```GameEngine.go```
