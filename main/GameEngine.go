@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -27,18 +28,21 @@ var window = app.New().NewWindow("StarWars Adventure")
 
 //All containers used in the game and append in the
 var boardContent = container.NewVBox()
+var titleContent = ContentExtension{container.NewVBox()}
 var labelContent = container.NewVBox()
 var errorContent = container.NewVBox()
 var inputContent = container.NewVBox()
-var imageContent = container.NewVBox()
+var imageContent = ContentExtension{container.NewVBox()}
 
 func main() {
-	appendImage(createLevelImage())
+	titleContent.appendImage(createLevelImage("./assets/logo.jpg"))
+	imageContent.appendImage(createLevelImage(images[gameLevel]))
 	appendLabel(gameTexts[gameLevel])
 	appendInput()
 	errorContent.Hide()
 
-	boardContent.Add(imageContent)
+	boardContent.Add(titleContent.container)
+	boardContent.Add(imageContent.container)
 	boardContent.Add(labelContent)
 	boardContent.Add(errorContent)
 	boardContent.Add(inputContent)
@@ -49,9 +53,17 @@ func main() {
 
 }
 
-func appendImage(backgroundImg *canvas.Image) {
-	imageContent.RemoveAll()
-	imageContent.Add(backgroundImg)
+type ContentFeature interface {
+	appendImage(image *canvas.Image)
+}
+
+type ContentExtension struct {
+	container *fyne.Container
+}
+
+func (containerExt ContentExtension) appendImage(image *canvas.Image) {
+	containerExt.container.RemoveAll()
+	containerExt.container.Add(image)
 }
 
 func appendLabel(text string) {
@@ -90,8 +102,8 @@ func processAction(input *widget.Entry) func() {
 			if allActions {
 				gameLevel = gameLevel + 1
 				cleanInput()
-				levelImg := createLevelImage()
-				appendImage(levelImg)
+				levelImg := createLevelImage(images[gameLevel])
+				imageContent.appendImage(levelImg)
 				appendLabel(gameTexts[gameLevel])
 			} else {
 				appendErrorLabel(fmt.Sprintf("Wrong Action. You're missing %d actions", remains))
@@ -100,8 +112,8 @@ func processAction(input *widget.Entry) func() {
 	}
 }
 
-func createLevelImage() *canvas.Image {
-	background := loadImage(images[gameLevel])
+func createLevelImage(imagePath string) *canvas.Image {
+	background := loadImage(imagePath)
 	backgroundImg := canvas.NewImageFromImage(background)
 	backgroundImg.FillMode = canvas.ImageFillOriginal
 	return backgroundImg
