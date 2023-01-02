@@ -15,6 +15,22 @@ var images = []string{
 	"./assets/han_solo.jpeg",
 }
 
+var middleGame = []string{
+	"./assets/sandstorm.jpeg",
+	"./assets/tatooin_inside.jpeg",
+	"./assets/pod.jpeg",
+	"./assets/cantina.jpeg",
+	"./assets/han_solo.jpeg",
+}
+
+var gameOver = []string{
+	"./assets/sandstorm_end.jpeg",
+	"",
+	"./assets/race_end.jpeg",
+	"",
+	"",
+}
+
 //Collection of texts of the whole game
 var gameTexts = []string{
 	"You wake up confuse, you're not entirely sure what happens.\n " +
@@ -32,6 +48,14 @@ var gameTexts = []string{
 		"Then you remember the old Kenobi told you about a remote planet where you can find Yoda. The Jedi master",
 }
 
+var middleGameText = []string{
+	"Hurry up a sandstorm is coming to you.",
+	"Remember, you want to escape in a pod. But it seems to be shutdown.",
+	"The storm troppers are getting closer, there must be a way to get faster.",
+	"The strange couple is looking to you, maybe you should meet them",
+	"You remember the planet start by letter D",
+}
+
 type LevelAction struct {
 	minActions int
 	actions    []string
@@ -42,6 +66,6 @@ var imagesActions = []LevelAction{
 	{2, []string{"into", "inside", "house", "cave"}},
 	{2, []string{"start", "on", "activate", "pod", "racer"}},
 	{1, []string{"accelerate", "full-throttler"}},
-	{1, []string{"approach", "go", "walk", "shit"}},
+	{1, []string{"approach", "go", "walk", "sit", "meet"}},
 	{1, []string{"Dagobah", "dagobah"}},
 }

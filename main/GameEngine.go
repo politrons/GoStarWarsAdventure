@@ -15,6 +15,7 @@ import (
 	"log"
 	"os"
 	"strings"
+	"time"
 )
 
 //Index of background image
@@ -35,8 +36,8 @@ var inputContent = container.NewVBox()
 var imageContent = ContentExtension{container.NewVBox()}
 
 func main() {
-	titleContent.appendImage(createLevelImage("./assets/logo.jpg"))
-	imageContent.appendImage(createLevelImage(images[gameLevel]))
+	titleContent.appendImage(createImage("./assets/logo.jpg"))
+	imageContent.appendImage(createImage(images[gameLevel]))
 	appendLabel(gameTexts[gameLevel])
 	appendInput()
 	errorContent.Hide()
@@ -46,6 +47,8 @@ func main() {
 	boardContent.Add(labelContent)
 	boardContent.Add(errorContent)
 	boardContent.Add(inputContent)
+
+	go renderMiddleLevelGame()
 
 	window.SetContent(boardContent)
 	window.CenterOnScreen()
@@ -102,9 +105,10 @@ func processAction(input *widget.Entry) func() {
 			if allActions {
 				gameLevel = gameLevel + 1
 				cleanInput()
-				levelImg := createLevelImage(images[gameLevel])
+				levelImg := createImage(images[gameLevel])
 				imageContent.appendImage(levelImg)
 				appendLabel(gameTexts[gameLevel])
+				go renderMiddleLevelGame()
 			} else {
 				appendErrorLabel(fmt.Sprintf("Wrong Action. You're missing %d actions", remains))
 			}
@@ -112,11 +116,11 @@ func processAction(input *widget.Entry) func() {
 	}
 }
 
-func createLevelImage(imagePath string) *canvas.Image {
-	background := loadImage(imagePath)
-	backgroundImg := canvas.NewImageFromImage(background)
-	backgroundImg.FillMode = canvas.ImageFillOriginal
-	return backgroundImg
+func createImage(imagePath string) *canvas.Image {
+	gameImage := loadImage(imagePath)
+	gameImageRender := canvas.NewImageFromImage(gameImage)
+	gameImageRender.FillMode = canvas.ImageFillOriginal
+	return gameImageRender
 }
 
 func cleanErrorLabel() {
@@ -127,6 +131,22 @@ func cleanErrorLabel() {
 func cleanInput() {
 	inputContent.RemoveAll()
 	appendInput()
+}
+
+/**
+Function to run [async] during the middle of the level to give a hint.
+We use [recover] operator to handle possible panic runtime errors.
+*/
+func renderMiddleLevelGame() {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("Recovering from Panic:", err)
+		}
+	}()
+	time.Sleep(60 * time.Second)
+	appendLabel(middleGameText[gameLevel])
+	middleImage := createImage(middleGame[gameLevel])
+	imageContent.appendImage(middleImage)
 }
 
 /**
