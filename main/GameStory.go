@@ -13,6 +13,7 @@ var images = []string{
 	"./assets/pod.jpeg",
 	"./assets/cantina.jpeg",
 	"./assets/han_solo.jpeg",
+	"./assets/yoda.jpeg",
 }
 
 var middleGame = []string{
@@ -21,6 +22,7 @@ var middleGame = []string{
 	"./assets/pod.jpeg",
 	"./assets/cantina.jpeg",
 	"./assets/han_solo.jpeg",
+	"./assets/yoda.jpeg",
 }
 
 var gameOver = []string{
@@ -29,6 +31,7 @@ var gameOver = []string{
 	"./assets/race_end.jpeg",
 	"./assets/cantina.jpeg",
 	"./assets/han_solo.jpeg",
+	"./assets/yoda.jpeg",
 }
 
 //Collection of texts of the whole game
@@ -46,6 +49,7 @@ var gameTexts = []string{
 		"Maybe you should approach....",
 	"Hi, I'm Han Solo, best pilot of the Galaxy. Where do you need to go?. The price wont be cheap by the way.\n" +
 		"Then you remember the old Kenobi told you about a remote planet where you can find Yoda. The Jedi master",
+	"Find me you did, now training you I will",
 }
 
 var middleGameText = []string{
@@ -54,6 +58,7 @@ var middleGameText = []string{
 	"The Storm Troopers are getting closer, there must be a way to get faster.",
 	"The strange couple is looking to you, maybe you should meet them",
 	"You remember the planet start by letter D",
+	"Find me you did, now training you I will",
 }
 
 var gameOverText = []string{
@@ -62,6 +67,7 @@ var gameOverText = []string{
 	"Your pod has been hit and your body is split all over the desert.",
 	"You have wait too much to escape.",
 	"Han-Solo is sick to wait since you cannot remember where to go.",
+	"Thanks for gaming.",
 }
 
 type LevelAction struct {
@@ -71,9 +77,9 @@ type LevelAction struct {
 
 //Collection of actions of the whole game
 var imagesActions = []LevelAction{
-	{2, []string{"into", "inside", "house", "cave"}},
+	{2, []string{"enter", "into", "inside", "house", "cave"}},
 	{2, []string{"start", "on", "activate", "pod", "racer"}},
-	{1, []string{"accelerate", "full-throttler"}},
+	{1, []string{"accelerate", "full-throttler", "faster"}},
 	{1, []string{"approach", "go", "walk", "sit", "meet"}},
 	{1, []string{"Dagobah", "dagobah"}},
 }

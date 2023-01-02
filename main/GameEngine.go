@@ -93,7 +93,7 @@ func appendInput() {
 }
 
 /**
-Function to obtain the user action over the level and determine if he pass to the next level or not.
+High order Function to obtain the user action over the level and determine if he pass to the next level or not.
 */
 func processAction(input *widget.Entry) func() {
 	return func() {
