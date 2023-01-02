@@ -48,7 +48,8 @@ func main() {
 	boardContent.Add(errorContent)
 	boardContent.Add(inputContent)
 
-	go renderMiddleLevelGame()
+	go renderMiddleLevelGame(gameLevel)
+	go renderGameOver(gameLevel)
 
 	window.SetContent(boardContent)
 	window.CenterOnScreen()
@@ -108,7 +109,8 @@ func processAction(input *widget.Entry) func() {
 				levelImg := createImage(images[gameLevel])
 				imageContent.appendImage(levelImg)
 				appendLabel(gameTexts[gameLevel])
-				go renderMiddleLevelGame()
+				go renderMiddleLevelGame(gameLevel)
+				go renderGameOver(gameLevel)
 			} else {
 				appendErrorLabel(fmt.Sprintf("Wrong Action. You're missing %d actions", remains))
 			}
@@ -137,16 +139,51 @@ func cleanInput() {
 Function to run [async] during the middle of the level to give a hint.
 We use [recover] operator to handle possible panic runtime errors.
 */
-func renderMiddleLevelGame() {
+func renderMiddleLevelGame(asyncGameLevel int) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Println("Recovering from Panic:", err)
 		}
 	}()
 	time.Sleep(60 * time.Second)
-	appendLabel(middleGameText[gameLevel])
-	middleImage := createImage(middleGame[gameLevel])
-	imageContent.appendImage(middleImage)
+	if gameLevel == asyncGameLevel {
+		appendLabel(middleGameText[gameLevel])
+		middleImage := createImage(middleGame[gameLevel])
+		imageContent.appendImage(middleImage)
+	}
+}
+
+/**
+Function to run [async] the game over of the level.
+We use [recover] operator to handle possible panic runtime errors.
+*/
+func renderGameOver(asyncGameLevel int) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Println("Recovering from Panic:", err)
+		}
+	}()
+	time.Sleep(120 * time.Second)
+	if gameLevel == asyncGameLevel {
+		appendLabel(gameOverText[gameLevel])
+		gameOverImage := createImage(gameOver[gameLevel])
+		imageContent.appendImage(gameOverImage)
+		restartGame()
+	}
+}
+
+/**
+Clear all content and invoke again the main method.
+*/
+func restartGame() {
+	time.Sleep(5 * time.Second)
+	imageContent.container.RemoveAll()
+	titleContent.container.RemoveAll()
+	labelContent.RemoveAll()
+	inputContent.RemoveAll()
+	boardContent.RemoveAll()
+	gameLevel = 0
+	main()
 }
 
 /**
