@@ -136,7 +136,7 @@ func cleanInput() {
 }
 
 /**
-Function to run [async] during the middle of the level to give a hint.
+Function to be run [async] during the middle of the level to give a hint.
 We use [recover] operator to handle possible panic runtime errors.
 */
 func renderMiddleLevelGame(asyncGameLevel int) {
@@ -154,7 +154,7 @@ func renderMiddleLevelGame(asyncGameLevel int) {
 }
 
 /**
-Function to run [async] the game over of the level.
+Function to be run [async] the game over of the level.
 We use [recover] operator to handle possible panic runtime errors.
 */
 func renderGameOver(asyncGameLevel int) {
@@ -212,7 +212,7 @@ func loadImage(filePath string) image.Image {
 }
 
 /**
-Util function to check if an action is part of the array passed
+Util function to check if an action is part of the LevelAction
 */
 func (actions LevelAction) containsAll(action string) (bool, int) {
 	var actionCount = 0
